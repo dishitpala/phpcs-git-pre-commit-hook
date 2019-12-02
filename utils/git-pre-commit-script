@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if REV=$(git rev-parse -q --verify HEAD); then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=bfd10bf1bc1768c4a5ab35534388ecc7ef2ce517
+fi
+
+FILES=$(git diff-index --name-only --cached --diff-filter=ACMR $against -- | grep .php )
+
+if [ "$FILES" == "" ]; then
+	echo "No files to check with PHPCS."
+	exit 0
+fi
+
+set -ex
+
+{{PHPCS_BIN}} --standard=phpcs.xml -s $FILES
